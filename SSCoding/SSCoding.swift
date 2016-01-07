@@ -14,6 +14,7 @@ var SSCodingDefines: [String: SSCoding.Type] = [
     "\(SSCodingPrefix)School": School.self,
     "\(SSCodingPrefix)Teacher": Teacher.self,
     "\(SSCodingPrefix)Honor": Honor.self,
+    "\(SSCodingPrefix)SimpleStruct": SimpleStruct.self,
 ]
 
 protocol SSCoding {
