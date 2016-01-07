@@ -19,6 +19,8 @@ protocol SSCoding {
     
     init?(coder aDecoder: SSCoder)
     
+    func collectionItems() -> [String: [SSCoding]]
+    
 }
 
 struct SSCoder {
@@ -36,6 +38,19 @@ struct SSCoder {
         else {
             return nil
         }
+    }
+    
+    func requestStructs(rootKey: String) -> [SSCoding]? {
+        guard let values = self.values[rootKey] as? [[String: AnyObject]] else {
+            return nil
+        }
+        var decodeStructs: [SSCoding] = []
+        for value in values {
+            if let decodeStruct = SSCodingHelper.decodeDictionary(value) {
+                decodeStructs.append(decodeStruct)
+            }
+        }
+        return decodeStructs
     }
     
 }
@@ -120,6 +135,11 @@ struct SSCodingHelper {
             else if let label = child.label, let value = child.value as? AnyObject {
                 dict[label] = value
             }
+        }
+        for (collectionKey, collectionValues) in rootStruct.collectionItems() {
+            dict[collectionKey] = collectionValues.map({ (childStruct) -> [String: AnyObject] in
+                encodeDictionary(childStruct)
+            })
         }
         return dict
     }

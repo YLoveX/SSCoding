@@ -14,6 +14,7 @@ struct School: SSCoding {
     let area: Double
     
     let teacher: Teacher
+    var teachers: [Teacher] = []
     
     init(name: String, area: Double, teacher: Teacher) {
         self.name = name
@@ -30,6 +31,21 @@ struct School: SSCoding {
         self.name = name
         self.area = area
         self.teacher = teacher
+        if let teachers = aDecoder.requestStructs("teachers") {
+            self.teachers = teachers.filter({ (item) -> Bool in
+                item is Teacher
+            }).map({ (item) -> Teacher in
+                item as! Teacher
+            })
+        }
+    }
+    
+    func collectionItems() -> [String: [SSCoding]] {
+        return [
+            "teachers": self.teachers.map({ (item) -> SSCoding in
+                return item as SSCoding
+            })
+        ]
     }
     
 }
@@ -52,10 +68,18 @@ struct Teacher: SSCoding {
         self.age = age
     }
     
+    func collectionItems() -> [String : [SSCoding]] {
+        return [:]
+    }
+    
 }
 
 let teacher = Teacher(name: "Pony", age: 26)
-let school = School(name: "True Light Middle School", area: 4670.9394, teacher: teacher)
+var school = School(name: "True Light Middle School", area: 4670.9394, teacher: teacher)
+school.teachers = [
+    Teacher(name: "Dennies", age: 32),
+    Teacher(name: "Tom", age: 36),
+]
 
 let encodedData = NSKeyedArchiver.archivedDataWithRootStruct(school)
 
@@ -66,6 +90,11 @@ if let decodedScholl = NSKeyedUnarchiver.unarchiveStructWithData(encodedData) as
     print("Now printing teacher")
     print(decodedScholl.teacher.name)
     print(decodedScholl.teacher.age)
+    print("Now printing teachers")
+    for teacher in decodedScholl.teachers {
+        print(teacher.name)
+        print(teacher.age)
+    }
 }
 
 
