@@ -12,14 +12,16 @@ let SSCodingPrefix = "Default."
 
 var SSCodingDefines: [String: SSCoding.Type] = [
     "\(SSCodingPrefix)School": School.self,
-    "\(SSCodingPrefix)Teacher": Teacher.self
+    "\(SSCodingPrefix)Teacher": Teacher.self,
+    "\(SSCodingPrefix)Honor": Honor.self,
 ]
 
 protocol SSCoding {
     
     init?(coder aDecoder: SSCoder)
     
-    func collectionItems() -> [String: [SSCoding]]
+    func arrayItems() -> [String: [SSCoding]]
+    func dictionaryItems() -> [String: [String: SSCoding]]
     
 }
 
@@ -40,7 +42,7 @@ struct SSCoder {
         }
     }
     
-    func requestStructs(rootKey: String) -> [SSCoding]? {
+    func requestStructs(arrayKey rootKey: String) -> [SSCoding]? {
         guard let values = self.values[rootKey] as? [[String: AnyObject]] else {
             return nil
         }
@@ -48,6 +50,19 @@ struct SSCoder {
         for value in values {
             if let decodeStruct = SSCodingHelper.decodeDictionary(value) {
                 decodeStructs.append(decodeStruct)
+            }
+        }
+        return decodeStructs
+    }
+    
+    func requestStructs(dictionaryKey rootKey: String) -> [String: SSCoding]? {
+        guard let values = self.values[rootKey] as? [String: [String: AnyObject]] else {
+            return nil
+        }
+        var decodeStructs: [String: SSCoding] = [:]
+        for (k, v) in values {
+            if let decodeStruct = SSCodingHelper.decodeDictionary(v) {
+                decodeStructs[k] = decodeStruct
             }
         }
         return decodeStructs
@@ -136,10 +151,17 @@ struct SSCodingHelper {
                 dict[label] = value
             }
         }
-        for (collectionKey, collectionValues) in rootStruct.collectionItems() {
+        for (collectionKey, collectionValues) in rootStruct.arrayItems() {
             dict[collectionKey] = collectionValues.map({ (childStruct) -> [String: AnyObject] in
                 encodeDictionary(childStruct)
             })
+        }
+        for (collectionKey, collectionValues) in rootStruct.dictionaryItems() {
+            var tmpDict: [String: AnyObject] = [:]
+            for (k, v) in collectionValues {
+                tmpDict[k] = encodeDictionary(v)
+            }
+            dict[collectionKey] = tmpDict
         }
         return dict
     }
