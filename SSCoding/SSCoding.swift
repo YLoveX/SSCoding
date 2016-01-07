@@ -21,8 +21,10 @@ protocol SSCoding {
     
     init?(coder aDecoder: SSCoder)
     
-    func arrayItems() -> [String: [SSCoding]]
-    func dictionaryItems() -> [String: [String: SSCoding]]
+    func additionItems() ->
+        (arrayItems: [String: [SSCoding]]?,
+        dictionaryItems:[String: [String: SSCoding]]?,
+        optionalItems: [String: AnyObject]?)?
     
 }
 
@@ -152,17 +154,28 @@ struct SSCodingHelper {
                 dict[label] = value
             }
         }
-        for (collectionKey, collectionValues) in rootStruct.arrayItems() {
-            dict[collectionKey] = collectionValues.map({ (childStruct) -> [String: AnyObject] in
-                encodeDictionary(childStruct)
-            })
-        }
-        for (collectionKey, collectionValues) in rootStruct.dictionaryItems() {
-            var tmpDict: [String: AnyObject] = [:]
-            for (k, v) in collectionValues {
-                tmpDict[k] = encodeDictionary(v)
+        if let addtionalItems = rootStruct.additionItems() {
+            if let arrayItems = addtionalItems.arrayItems {
+                for (collectionKey, collectionValues) in arrayItems {
+                    dict[collectionKey] = collectionValues.map({ (childStruct) -> [String: AnyObject] in
+                        encodeDictionary(childStruct)
+                    })
+                }
             }
-            dict[collectionKey] = tmpDict
+            if let dictionaryItems = addtionalItems.dictionaryItems {
+                for (collectionKey, collectionValues) in dictionaryItems {
+                    var tmpDict: [String: AnyObject] = [:]
+                    for (k, v) in collectionValues {
+                        tmpDict[k] = encodeDictionary(v)
+                    }
+                    dict[collectionKey] = tmpDict
+                }
+            }
+            if let optionalItems = addtionalItems.optionalItems {
+                for (optionalKey, optionalValue) in optionalItems {
+                    dict[optionalKey] = optionalValue
+                }
+            }
         }
         return dict
     }

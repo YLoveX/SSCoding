@@ -40,16 +40,16 @@ struct School: SSCoding {
         }
     }
     
-    func arrayItems() -> [String: [SSCoding]] {
-        return [
-            "teachers": self.teachers.map({ (item) -> SSCoding in
-                return item as SSCoding
-            })
-        ]
-    }
-    
-    func dictionaryItems() -> [String : [String : SSCoding]] {
-        return [:]
+    func additionItems() -> (arrayItems: [String : [SSCoding]]?, dictionaryItems: [String : [String : SSCoding]]?, optionalItems: [String : AnyObject]?)? {
+        return (
+            [
+                "teachers": self.teachers.map({ (item) -> SSCoding in
+                    return item as SSCoding
+                })
+            ],
+            nil,
+            nil
+        )
     }
     
 }
@@ -86,20 +86,19 @@ struct Teacher: SSCoding {
             }()
     }
     
-    func arrayItems() -> [String : [SSCoding]] {
-        return [:]
-    }
-    
-    func dictionaryItems() -> [String : [String : SSCoding]] {
-        return [
-            "honors": {
-                var dict: [String : SSCoding] = [:]
-                for (k, v) in self.honors {
-                    dict[k] = (v as SSCoding)
-                }
-                return dict
-                }()
-        ]
+    func additionItems() -> (arrayItems: [String : [SSCoding]]?, dictionaryItems: [String : [String : SSCoding]]?, optionalItems: [String : AnyObject]?)? {
+        return (
+            nil,
+            [
+                "honors": {
+                    var dict: [String : SSCoding] = [:]
+                    for (k, v) in self.honors {
+                        dict[k] = (v as SSCoding)
+                    }
+                    return dict
+                    }()
+            ],
+            nil)
     }
     
 }
@@ -122,12 +121,8 @@ struct Honor: SSCoding {
         self.level = level
     }
     
-    func arrayItems() -> [String : [SSCoding]] {
-        return [:]
-    }
-    
-    func dictionaryItems() -> [String : [String : SSCoding]] {
-        return [:]
+    func additionItems() -> (arrayItems: [String : [SSCoding]]?, dictionaryItems: [String : [String : SSCoding]]?, optionalItems: [String : AnyObject]?)? {
+        return nil
     }
     
 }

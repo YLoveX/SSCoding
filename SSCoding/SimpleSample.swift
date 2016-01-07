@@ -10,7 +10,7 @@ import Foundation
 
 struct SimpleStruct: SSCoding {
     
-    let anInt: Int
+    let anInt: Int?
     
     init(anInt: Int) {
         self.anInt = anInt
@@ -23,12 +23,8 @@ struct SimpleStruct: SSCoding {
         self.anInt = anInt
     }
     
-    func arrayItems() -> [String : [SSCoding]] {
-        return [:]
-    }
-    
-    func dictionaryItems() -> [String : [String : SSCoding]] {
-        return [:]
+    func additionItems() -> (arrayItems: [String : [SSCoding]]?, dictionaryItems: [String : [String : SSCoding]]?, optionalItems: [String : AnyObject]?)? {
+        return (nil, nil, ["anInt": anInt ?? NSNull()])
     }
     
 }
